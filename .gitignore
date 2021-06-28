@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 *.o
 main
 
@@ -11,3 +12,19 @@ out_mats/*
 
 # git update-index --assume-unchanged on data folders
 
+=======
+*.o
+main
+
+# hidden vim swap files
+.*
+
+# big files, ignore tracking
+img_mats/*
+images/*
+out_mats/*
+build/*
+
+# git update-index --assume-unchanged on data folders
+
+>>>>>>> 071244a (gitignore update)
