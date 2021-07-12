@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 #!/usr/bin/python
 
 import numpy as np
@@ -155,3 +156,123 @@ if __name__ == "__main__":
         append_matrix(os.path.join(foldername, filename), f)
 
 >>>>>>> fc1f714 (버그 수정)
+=======
+#!/usr/bin/python
+
+from pathlib import WindowsPath
+import numpy as np
+from PIL import Image
+from numpy.lib.shape_base import take_along_axis
+import pylab
+import sys
+import os
+from enum import Enum
+import time
+import multiprocessing
+
+# 컬러 이미지인지 흑백 이미지인지
+class ImgType(Enum):
+    GREY = 1
+    COLOR = 3
+
+# 이미지와 관련된 정보들을 담아둔 클래스
+class ImgInfo:
+    def __init__(self, imgType: ImgType, width = 512, height = 512) -> None:
+        self.imgType = ImgType
+        if imgType == ImgType.GREY:
+            self.dirname = os.path.join('images', 'grey')
+        elif imgType == ImgType.COLOR:
+            self.dirname = os.path.join('images', 'color')
+        self.depth = imgType.value
+        
+        self.width = width
+        self.height = height
+        
+
+#im_names = ["airplane.png", "lena.png",  "fruits.png"]  # 512 * 512 * 3
+#gray_imnames = ["barbara.png", "boat.png"] # 512 * 512
+
+class Img2Matrix:
+    def __init__(self, imgInfo: ImgInfo, num_cores, outFolderName):
+        self.imgInfo = imgInfo
+        self.num_cores = num_cores
+        self.outFolderName = outFolderName
+    
+    # 해당 이미지를 불러와서 matrix 형태로 파일에 저장한다.
+    def append_matrix(self, filepath, outf):
+        img = Image.open(filepath)
+        im = np.asarray(img, dtype='float64')
+        #print(im.shape)
+        for i in range(im.shape[0]):
+            for j in range(im.shape[1]):
+                outf.write("%f,%f,%f " %(im[i][j][0], im[i][j][1], im[i][j][2]))
+            outf.write('\n')
+        outf.write('\n')
+        
+        # 테스트용 추후 삭제 요망
+        outf.seek(0)
+
+    def convertFiles2Matrix(self, filenames, outf):
+        for filename in filenames:
+            self.append_matrix(filename, outf)
+
+    # 주어진 파일들을 matrix 형태로 Convert해준다.
+    def convertFiles2MatrixByMultiprocess(self):
+        depth = self.imgInfo.depth 
+        foldername = self.imgInfo.dirname
+        width = self.imgInfo.width
+        height = self.imgInfo.height
+        
+        totalFilenames = os.listdir(foldername)
+        totalFilenames = [os.path.join(foldername, filename) for filename in totalFilenames]
+        totalFilenames = totalFilenames * 10
+        # 테스트해볼 충분한 사진이 없기때문에 기존에 존재하는 파일로 반복을 할 것임
+        
+        splitedFileNames = np.array_split(totalFilenames, self.num_cores)
+        splitedFileNames = [x.tolist() for x in splitedFileNames]
+        
+        print(f"Core 개수 : {self.num_cores}")
+        start = int(time.time())
+        
+        procs = []
+        outfs = []
+        for index, filenames in enumerate(splitedFileNames):
+            outFilename = os.path.join(self.outFolderName, "out" + str(index) + ".dat")
+            outf = open(outFilename, "w")
+            outf.write("%d %d %d %d\n" % (len(filenames), width, height, depth)) # image tensor dimensions
+            
+            proc = multiprocessing.Process(target=self.convertFiles2Matrix,
+                                            args=(filenames, outf))
+            procs.append(proc)
+            outfs.append(outf)
+            proc.start()
+        
+        for proc in procs:
+            proc.join()
+        for outf in outfs:
+            outf.close()
+        
+        print("run time(sec) :", int(time.time()) - start)
+        
+        
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2 or len(sys.argv) > 3:
+        print(f"Usage: python3 {sys.argv[0]} outFolderName [num_cores]")
+        exit()
+    outFolderName = sys.argv[1]
+    
+    num_cores = 1
+    if len(sys.argv) == 3:
+        if sys.argv[2].isdigit():
+            num_cores = int(sys.argv[2])
+        else:
+            print(f"Usage: python3 {sys.argv[0]} outFolderName [num_cores]")
+            exit()
+
+    # 컬러 사진을 사용할지, 흑백 사진을 사용할지 선택
+    imgInfo = ImgInfo(ImgType.COLOR)
+    
+    Img2Matrix(imgInfo, num_cores, outFolderName).convertFiles2MatrixByMultiprocess()
+
+>>>>>>> 500efa4 (병렬 처리 적용)
