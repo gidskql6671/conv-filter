@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 *.o
 main
 
@@ -28,3 +29,20 @@ build/*
 # git update-index --assume-unchanged on data folders
 
 >>>>>>> 071244a (gitignore update)
+=======
+*.o
+main
+
+# hidden vim swap files
+.*
+
+# big files, ignore tracking
+img_mats/*
+images/*
+out_mats/*
+c_executions/*
+c_object_files/*
+
+# git update-index --assume-unchanged on data folders
+
+>>>>>>> e93676d (gitignore 수정)
