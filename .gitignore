@@ -1,6 +1,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 *.o
 main
 
@@ -66,3 +67,24 @@ c_object_files/*
 # git update-index --assume-unchanged on data folders
 
 >>>>>>> f74e702 (필요한 폴더 등록을 위한 README.md 추가)
+=======
+*.o
+main
+
+# hidden vim swap files
+.*
+
+# big files, ignore tracking
+img_mats/outs_img2mat/*
+img_mats/outs_apply_filter/*
+images/*
+result_images/*
+c_executions/*
+c_object_files/*
+
+!result_images/sample
+!README.md
+
+# git update-index --assume-unchanged on data folders
+
+>>>>>>> 60574de (디렉토리 구조 개선)
