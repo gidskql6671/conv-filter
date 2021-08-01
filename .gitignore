@@ -3,6 +3,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 *.o
 main
 
@@ -112,3 +113,30 @@ c_object_files/*
 # My Test File.
 test.cpp
 >>>>>>> 89aedb8 (gitignore 업데이트)
+=======
+*.o
+main
+
+# hidden vim swap files
+.*
+
+# big files, ignore tracking
+img_mats/outs_img2mat/*
+img_mats/outs_apply_filter/*
+images/*
+result_images/*
+c_executions/*
+c_object_files/*
+
+!result_images/sample
+!README.md
+
+# git update-index --assume-unchanged on data folders
+
+# My Test File.
+test.cpp
+
+# 프로젝트 구조를 위한 README 파일
+img_mats/outs_img2mat/README.md
+img_mats/outs_apply_filter/README.md
+>>>>>>> 8b4da41 (gitignore 수정)
