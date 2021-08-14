@@ -7,6 +7,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 #!/usr/bin/python
 
 import numpy as np
@@ -987,3 +988,107 @@ if __name__ == "__main__":
     print("run time(sec) :", round(time.time() - start, 3))
 
 >>>>>>> 23f9253 (스레드를 사용하는 병렬처리 추가)
+=======
+#!/usr/bin/python
+
+from pathlib import WindowsPath
+import numpy as np
+from PIL import Image
+from numpy.lib.shape_base import take_along_axis
+import pylab
+import sys
+import os
+from enum import Enum
+import time
+import multiprocessing
+import threading
+
+
+# 컬러 이미지인지 흑백 이미지인지
+class ImgType(Enum):
+    GREY = 1
+    COLOR = 3
+
+# 이미지와 관련된 정보들을 담아둔 클래스
+class ImgInfo:
+    def __init__(self, imgType: ImgType, width = 512, height = 512) -> None:
+        self.imgType = ImgType
+        self.depth = imgType.value
+        
+        self.width = width
+        self.height = height
+  
+
+
+# 이미지를 matrix 형태로 파일에 저장한다.
+def _append_matrix(filepath, outf):
+    img = Image.open(filepath)
+    im = np.asarray(img, dtype='float64')
+    
+    for i in range(im.shape[0]):
+        for j in range(im.shape[1]):
+            outf.write("%f,%f,%f " %(im[i][j][0], im[i][j][1], im[i][j][2]))
+        outf.write('\n')
+    outf.write('\n')
+     
+# 주어진 이미지 파일들을 Matrix 형태로 Convert한다.
+def _convertImages2Matrixs(filepaths, outFilename, imgInfo):
+    outf = open(outFilename, "w")
+    outf.write(f"{len(filepaths)} {imgInfo.width} {imgInfo.height} {imgInfo.depth}\n") # image tensor dimensions
+    
+    for filepath in filepaths:
+        _append_matrix(filepath, outf)
+    
+    outf.close()
+
+# 멀티 프로세스를 사용하여 파일들을 matrix 형태로 Convert해준다.
+def convertImage2MatrixByMultiprocess(inputDirname, outputDirname, num_cores = 1, imgInfo= ImgInfo(ImgType.COLOR)):
+    # inputDirname 디렉토리의 파일들의 전체 경로를 얻어준다.
+    filepaths = [os.path.join(inputDirname, filename) for filename in os.listdir(inputDirname)]
+    
+    # 병렬 처리를 위해 여러개의 리스트로 나눔. ex) [1, 2, 3, 4, 5, 6] -> [[1, 2], [3, 4], [5, 6]]
+    splitedFilepaths = np.array_split(filepaths, num_cores)
+    splitedFilepaths = [x.tolist() for x in splitedFilepaths]
+    
+    procs = []
+    for index, filepaths in enumerate(splitedFilepaths):
+        # 프로세스 별로 다른 Output 파일을 반환.
+        outFilename = os.path.join(outputDirname, "img2mat" + str(index) + ".dat")
+        
+        # 프로세스 별로 image convert
+        proc = multiprocessing.Process(target=_convertImages2Matrixs, args=(filepaths, outFilename, imgInfo))
+        proc.start()
+        
+        procs.append(proc)
+    
+    for proc in procs:
+        proc.join()
+
+
+if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print(f"Usage: python3 {sys.argv[0]} outputDirname num_cores")
+        exit()
+    outputDirname = sys.argv[1]
+    os.makedirs(outputDirname, exist_ok=True)
+    
+    if sys.argv[2].isdigit():
+        num_cores = int(sys.argv[2])
+    else:
+        print(f"Usage: num_cores는 정수여야 합니다.")
+        exit()
+
+    # 컬러사진을 사용할 것이며, 512x512사이즈(기본값)을 사용할 것임.
+    imgInfo = ImgInfo(ImgType.COLOR)
+    inputDirname = os.path.join('images', 'color');
+            
+    # 테스트 용. 시간 측정
+    print(f"Core 개수 : {num_cores}")
+    start = time.time()
+    
+    convertImage2MatrixByMultiprocess(inputDirname, outputDirname, num_cores, imgInfo);
+    # convertImage2MatrixByThread(inputDirname, outputDirname, num_cores, imgInfo)
+    
+    print("run time(sec) :", round(time.time() - start, 3))
+
+>>>>>>> 3d4ae38 (리팩토링)
