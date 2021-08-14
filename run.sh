@@ -1,9 +1,17 @@
 #!/bin/bash
 
 # 사용하는 코어의 개수
-# 여기서는 명령행인자로 개수를 넣었는데, 그냥 프로그램 내에서 사용가능한 코어개수만큼 사용하는 것도 좋을것 같아요.
-# 그렇게 할려다가 왠지 다 쓰면 안좋을거같아서... 
-num_cores=5
+if [ $# -eq 1 ]; then
+    v=$1
+    r=${v//[0-9]/}
+    if [ -z "$r" ]; then
+        num_cores=$1
+    else
+        num_cores=5
+    fi
+else
+    num_cores=5
+fi
 
 # clean the current build
 make clean
