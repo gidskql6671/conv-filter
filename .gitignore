@@ -4,6 +4,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 *.o
 main
 
@@ -140,3 +141,38 @@ test.cpp
 img_mats/outs_img2mat/README.md
 img_mats/outs_apply_filter/README.md
 >>>>>>> 8b4da41 (gitignore 수정)
+=======
+*.o
+main
+*.exe
+
+# hidden vim swap files
+.*
+
+# cmake 관련 파일들
+CMakeFiles/
+cmake_install.cmake
+CMakeCache.txt
+develop/Makefile
+develop/test.png
+
+# big files, ignore tracking
+img_mats/outs_img2mat/*
+img_mats/outs_apply_filter/*
+images/*
+result_images/*
+c_executions/*
+c_object_files/*
+
+!result_images/sample
+!README.md
+
+# git update-index --assume-unchanged on data folders
+
+# My Test File.
+test.cpp
+
+# 프로젝트 구조를 위한 README 파일
+img_mats/outs_img2mat/README.md
+img_mats/outs_apply_filter/README.md
+>>>>>>> 44760aa (개발환경 설정)
