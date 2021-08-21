@@ -8,7 +8,7 @@ project(${ProjectId} C CXX)
 set (CMAKE_CXX_STANDARD 17)
 find_package( OpenCV REQUIRED )
 
-file(GLOB SOURCES  *.cpp)
+file(GLOB SOURCES  src/*.* main.cpp)
 
 add_executable(main ${SOURCES})
 target_link_libraries(main ${OpenCV_LIBS})
