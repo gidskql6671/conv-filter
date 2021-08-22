@@ -17,7 +17,8 @@ int w_size, bias;     // kernel window size
 double** kernel; // image kernel 
 vector<filter*> filters;
 
-ThreadPool::ThreadPool pool(thread::hardware_concurrency()); // 스레드 풀 생성
+const int thread_count = thread::hardware_concurrency();
+ThreadPool::ThreadPool pool(thread_count); // 스레드 풀 생성
 
 
 void push_filter(int idx) {     
@@ -34,15 +35,7 @@ void push_filter(int idx) {
 	filters.push_back(f);
 }
 
-int work(int t, int id){
-	cout << id << " start \n";
-	this_thread::sleep_for(chrono::seconds(t));
-	cout << id << " end after " << t << "\n";
-	
-	return t + id;
-}
-
-void applyFilterAndSave(Mat image, string outPath){
+void applyFilterAndSaveWithMultiThread(Mat image, string outPath){
 	int sep_row = 512, sep_col = 512;
 	
 	int pading = 1;
@@ -103,6 +96,26 @@ void applyFilterAndSave(Mat image, string outPath){
 	}
 }
 
+// image에 필터를 적용하여 반환해준다.
+// 싱글 스레드로 실행된다.
+Mat applyFilterWithSingleThread(Mat image){
+	Mat pad_image;
+	
+	int pading = 1;
+	int stride = 1;
+
+	// 이미지에 패딩 추가
+	copyMakeBorder(image, pad_image, pading, pading, pading, pading, BORDER_CONSTANT, Scalar(0));
+	
+	int out_height = (pad_image.rows - w_size) / stride + 1;
+	int out_width = (pad_image.cols - w_size) / stride + 1;
+	
+	conv_layer clayer(pad_image.rows, pad_image.cols, image.channels(), w_size, stride, filters.size()); 
+	Mat output = get<2>(clayer.conv2d(pad_image, filters));
+	
+	return output;
+}
+
 int main(int argc, char *argv[]){
 	// 명령행 인자 유효성 검사 및 사전 준비
 	if (argc < 3){
@@ -142,13 +155,33 @@ int main(int argc, char *argv[]){
 	push_filter(2); // R
 	
 	
+	cout << "thread count : " << thread_count << endl;
 	clock_t t1 = clock();
 	
+	// 스레드가 한개면 파일이 클 경우, 내가 구현한 방식으로는 작동 안한다.
+	// 이런 경우에는 그냥 스레드 하나에서 쭉 동작시키자.
+	if (thread_count == 1){
+		for (const fs::directory_entry& entry : fs::directory_iterator(imageFolder)){
+		// 이미지 읽기
+			Mat image = imread(entry.path().u8string());
+			string outPath = (outputFolder / entry.path().filename()).u8string();
+			
+			Mat output = applyFilterWithSingleThread(image);
+			
+			imwrite(outPath, output);
+		}
+		
+		cout << "total time : " << (double)(clock() - t1) / CLOCKS_PER_SEC << " sec\n";
+		
+		pool.end();
+		
+		return 0;
+	}
+	
 	for (const fs::directory_entry& entry : fs::directory_iterator(imageFolder)){
-	// 이미지 읽기
 		Mat image = imread(entry.path().u8string());
 		
-		pool.enqueueJob(applyFilterAndSave, image, (outputFolder / entry.path().filename()).u8string());
+		pool.enqueueJob(applyFilterAndSaveWithMultiThread, image, (outputFolder / entry.path().filename()).u8string());
 	}
 	
 	clock_t t2 = clock();

@@ -9,7 +9,6 @@
 #include <condition_variable>
 #include <chrono>
 #include <future>
-#include <iostream>
 
 using namespace std;
 
@@ -25,7 +24,6 @@ namespace ThreadPool{
         future<typename result_of<F(Args...)>::type> enqueueJob(F&& f, Args&&... args);
         
         void end();
-        void join();
         
     private:
         size_t num_threads;
@@ -76,12 +74,7 @@ namespace ThreadPool{
 
     ThreadPool::~ThreadPool(){
         if (!stop_all){
-            stop_all = true;
-            cv_job_q.notify_all();
-            
-            for(auto& t : worker_threads){
-                t.join();
-            }
+            end();
         }
     }
 
@@ -106,10 +99,6 @@ namespace ThreadPool{
         stop_all = true;
         cv_job_q.notify_all();
         
-        join();
-    }
-    
-    void ThreadPool::join(){
         for(auto& t : worker_threads){
             t.join();
         }
