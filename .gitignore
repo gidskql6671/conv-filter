@@ -5,6 +5,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 *.o
 main
 
@@ -176,3 +177,24 @@ test.cpp
 img_mats/outs_img2mat/README.md
 img_mats/outs_apply_filter/README.md
 >>>>>>> 44760aa (개발환경 설정)
+=======
+*.o
+main
+*.exe
+
+# hidden vim swap files
+.*
+
+# cmake 관련 파일들
+CMakeFiles/
+cmake_install.cmake
+CMakeCache.txt
+
+# big files, ignore tracking
+images/*
+result_images/*
+
+!result_images/sample
+
+# git update-index --assume-unchanged on data folders
+>>>>>>> 12f0882 (프로젝트 구조 수정 및 README 작성)
