@@ -35,6 +35,8 @@ void push_filter(int idx) {
 	filters.push_back(f);
 }
 
+// image에 필터를 적용하여 파일에 저장한다.
+// 이미지의 크기가 크면, 멀티 스레드(스레드풀)를 사용하여 병렬처리한다.
 void applyFilterAndSaveWithMultiThread(Mat image, string outPath){
 	int sep_row = 512, sep_col = 512;
 	
@@ -49,7 +51,7 @@ void applyFilterAndSaveWithMultiThread(Mat image, string outPath){
 	int out_width = (pad_image.cols - w_size) / stride + 1;
 	
 	// 나눌 크기는 계속 테스트해보자
-	// 결과 이미지 크기가 512 이하라면 바로 필터 적용
+	// 결과 이미지 크기가 (sep_row, sep_col) 이하라면 바로 필터 적용
 	if (out_height <= sep_row && out_width <= sep_col){
 		conv_layer clayer(pad_image.rows, pad_image.cols, image.channels(), w_size, stride, filters.size()); 
 		Mat output = get<2>(clayer.conv2d(pad_image, filters));
@@ -72,6 +74,7 @@ void applyFilterAndSaveWithMultiThread(Mat image, string outPath){
 			}
 		}
 		
+		// 나눈 이미지를 병렬적으로 처리하고, 결과를 future 배열에 담음
 		vector<future<tuple<int, int, Mat>>> futures;
 		for(auto img_info: split_images){
 			int start_row, start_col;
@@ -82,6 +85,7 @@ void applyFilterAndSaveWithMultiThread(Mat image, string outPath){
 			futures.emplace_back(pool.enqueueJob(conv_layer::conv2d, clayer, split_img, filters, start_row, start_col));
 		} 
 		
+		// 필터를 적용한 이미지들을 다시 합침
 		Mat output(Size(out_width, out_height), image.type(), Scalar::all(0));
 		for(auto& f: futures){
 			tuple<int, int, Mat> result = f.get();
@@ -162,7 +166,7 @@ int main(int argc, char *argv[]){
 	// 이런 경우에는 그냥 스레드 하나에서 쭉 동작시키자.
 	if (thread_count == 1){
 		for (const fs::directory_entry& entry : fs::directory_iterator(imageFolder)){
-		// 이미지 읽기
+			// 이미지 읽기
 			Mat image = imread(entry.path().u8string());
 			string outPath = (outputFolder / entry.path().filename()).u8string();
 			
@@ -178,6 +182,7 @@ int main(int argc, char *argv[]){
 		return 0;
 	}
 	
+	// 이미지를 읽고, 스레드에게 job으로 던져줌
 	for (const fs::directory_entry& entry : fs::directory_iterator(imageFolder)){
 		Mat image = imread(entry.path().u8string());
 		
