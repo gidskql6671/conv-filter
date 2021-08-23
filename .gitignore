@@ -7,6 +7,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 *.o
 main
 
@@ -221,3 +222,23 @@ result_images/*
 
 # git update-index --assume-unchanged on data folders
 >>>>>>> e0f76b1 (gitignore 수정)
+=======
+*.o
+main
+*.exe
+
+# hidden vim swap files
+.*
+
+# cmake 관련 파일들
+CMakeFiles/
+cmake_install.cmake
+CMakeCache.txt
+Makefile
+
+# big files, ignore tracking
+images/*
+result_images/*
+
+# git update-index --assume-unchanged on data folders
+>>>>>>> 6840840 (gitignore 업데이트)
