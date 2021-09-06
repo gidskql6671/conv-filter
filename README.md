@@ -9,6 +9,10 @@
   
 
 ## Usage
+### Script
+1. ./run.sh
+
+### Non Script
 1. 컴파일
   1. `cmake . -G "MinGW Makefiles"`
   2. `make`
