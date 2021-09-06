@@ -120,6 +120,19 @@ Mat applyFilterWithSingleThread(Mat image){
 	return output;
 }
 
+struct HumanReadable {
+    std::uintmax_t size{};
+  private: friend
+    std::ostream& operator<<(std::ostream& os, HumanReadable hr) {
+        int i{};
+        double mantissa = hr.size;
+        for (; mantissa >= 1024.; mantissa /= 1024., ++i) { }
+        mantissa = std::ceil(mantissa * 10.) / 10.;
+        os << mantissa << "BKMGTPE"[i];
+        return i == 0 ? os : os << "B";
+    }
+};
+
 int main(int argc, char *argv[]){
 	// 명령행 인자 유효성 검사 및 사전 준비
 	if (argc < 3){
@@ -144,7 +157,6 @@ int main(int argc, char *argv[]){
 		fs::create_directories(outputFolder);
 	}
 	
-	
 	// 필터 입력 부분
 	cin >> w_size >> bias;
 	kernel = new double*[w_size]; 
@@ -159,8 +171,11 @@ int main(int argc, char *argv[]){
 	push_filter(2); // R
 	
 	
-	cout << "thread count : " << thread_count << endl;
+	cout << "thread count    : " << thread_count << "\n\n";
+	
 	clock_t t1 = clock();
+	int count = 0;
+	uintmax_t fileSize = 0;
 	
 	// 스레드가 한개면 파일이 클 경우, 내가 구현한 방식으로는 작동 안한다.
 	// 이런 경우에는 그냥 스레드 하나에서 쭉 동작시키자.
@@ -168,6 +183,9 @@ int main(int argc, char *argv[]){
 		for (const fs::directory_entry& entry : fs::directory_iterator(imageFolder)){
 			// 이미지 읽기
 			Mat image = imread(entry.path().u8string());
+			fileSize += fs::file_size(entry.path());
+			count++;
+			
 			string outPath = (outputFolder / entry.path().filename()).u8string();
 			
 			Mat output = applyFilterWithSingleThread(image);
@@ -175,7 +193,9 @@ int main(int argc, char *argv[]){
 			imwrite(outPath, output);
 		}
 		
-		cout << "total time : " << (double)(clock() - t1) / CLOCKS_PER_SEC << " sec\n";
+		cout << "image counts    : " << count << "\n";
+		cout << "total file size : " << HumanReadable{fileSize} << "\n\n";
+		cout << "total time      : " << (double)(clock() - t1) / CLOCKS_PER_SEC << " sec\n";
 		
 		pool.end();
 		
@@ -185,6 +205,8 @@ int main(int argc, char *argv[]){
 	// 이미지를 읽고, 스레드에게 job으로 던져줌
 	for (const fs::directory_entry& entry : fs::directory_iterator(imageFolder)){
 		Mat image = imread(entry.path().u8string());
+		fileSize += fs::file_size(entry.path());
+		count++;
 		
 		pool.enqueueJob(applyFilterAndSaveWithMultiThread, image, (outputFolder / entry.path().filename()).u8string());
 	}
@@ -199,9 +221,9 @@ int main(int argc, char *argv[]){
 	double apply_filter_time = (double)(t3 - t2) / CLOCKS_PER_SEC;
 	double total_time = (double)(t3 - t1) / CLOCKS_PER_SEC;
 	
-	cout << "load image time : " << load_image_time << " sec\n";
-	cout << "apply filter time : " << apply_filter_time << " sec\n";
-	cout << "total time : " << total_time << " sec\n";
+	cout << "image counts    : " << count << "\n";
+	cout << "total file size : " << HumanReadable{fileSize} << "\n\n";
+	cout << "total time      : " << total_time << " sec\n";
 	
 	return 0;
 }
