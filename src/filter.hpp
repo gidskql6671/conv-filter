@@ -18,7 +18,7 @@ double ***get_tensor(int x, int y, int z) {
 
 class filter {
 public:
-	double ***w, b;     // krenel matrix, bias term
+	double ***w, b; // krenel matrix, bias term
 	int window, depth;
 	filter(int _window, int _depth) 
 		: window(_window), depth(_depth) {

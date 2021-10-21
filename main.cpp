@@ -50,7 +50,6 @@ void applyFilterAndSaveWithMultiThread(Mat image, string outPath){
 	int out_height = (pad_image.rows - w_size) / stride + 1;
 	int out_width = (pad_image.cols - w_size) / stride + 1;
 	
-	// 나눌 크기는 계속 테스트해보자
 	// 결과 이미지 크기가 (sep_row, sep_col) 이하라면 바로 필터 적용
 	if (out_height <= sep_row && out_width <= sep_col){
 		conv_layer clayer(pad_image.rows, pad_image.cols, image.channels(), w_size, stride, filters.size()); 

@@ -8,6 +8,7 @@
 #include "opencv2/opencv.hpp"
 
 using namespace cv;
+using namespace std;
 
 class conv_layer
 {
@@ -38,17 +39,14 @@ public:
 	~conv_layer() {}
 
 
-	std::tuple<int, int, Mat> conv2d(Mat image, const std::vector<filter *> &filters, int start_row = 0, int start_col = 0){
+	tuple<int, int, Mat> conv2d(Mat image, const vector<filter *> &filters, int start_row = 0, int start_col = 0){
 		Mat output(out_height, out_width, image.type());
 
-		for (int k = 0; k < n_filters; ++k){ // k_th activation map
+		for (int k = 0; k < n_filters; ++k){ 
 			for (int i = 0; i < out_height; ++i){
 				uchar *output_row = output.ptr<uchar>(i);
 				
 				for (int j = 0; j < out_width; ++j){
-					// fill y[i][j] with kernel computation filters[k]->x + b
-					// compute boundaries inside original matrix after padding
-
 					int i_start = i * stride,
 						j_start = j * stride;
 					int i_end = i_start + window,
@@ -67,7 +65,7 @@ public:
 				}
 			}
 		}
-		return std::make_tuple(start_row, start_col, output);
+		return make_tuple(start_row, start_col, output);
 	}
 };
 
