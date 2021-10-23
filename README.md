@@ -5,6 +5,7 @@
 - gcc & g++ : MSYS2 사용
   - mingw64 8.0 버전이 `filesystem` 모듈과 버그를 일으켜 MSYS2를 사용함
 - cpp standard : cpp+17
+- opencv : 4.5.2
 - cmake 사용
   
 
