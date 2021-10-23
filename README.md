@@ -53,8 +53,8 @@
 |120개, 총 58.2MB|1.586|2.386|3.972|25.305|
 
 ## 제안하는 알고리즘
-Image Filtering 시 Divide&Conquer기법을 이용, 이미지 분할 후 Multi Threading을 통해 이를 처리, 후에 결과를 합쳐 이미지를 재구성 하는 방식을 사용, 단 Image width,col < 512pixel 일 경우 단일 쓰레드를 취하는 방식 사용  
-Image Save시에도 Divide&Conquer기법을 이용, 이미지 분할 후 Multu Threading을 통해 Bypass를 늘려 Throuput을 늘리는 방식 사용
+Image Filtering 시 Divide&Conquer기법을 이용, 이미지 분할 후 Multi Threading을 통해 이를 처리, 단 Image width,col < 512pixel 일 경우 단일 쓰레드를 취하는 방식 사용  
+분할 된 Image를 reconstruct 시에도 Divide&Conquer기법을 이용, Multu Threading을 통해 Bypass를 늘려 이를 처리, 이를 통해 Throuput 을 늘림
 
 Multi Threading 적용 시 약6~7배정도 excution time이 빨라졌다.
 
