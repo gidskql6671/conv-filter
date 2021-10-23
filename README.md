@@ -12,7 +12,7 @@
 ## Usage
 ### Required
 1. `CMakeList.txt` 파일 수정
-  - 1번 라인의 OpenCV 디렉토리 설정
+    - 1번 라인의 OpenCV 디렉토리 설정
 
 ### Script
 1. ./run.sh
