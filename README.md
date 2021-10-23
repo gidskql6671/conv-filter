@@ -26,11 +26,10 @@
   - `./result_images`는 결과 이미지가 담길 폴더. 없을 경우 만들어줌
 
 ## 프로그램 플로우
-1. opencv로 이미지 파일을 불러온다.
-2. filter를 적용한다.
-3. filter가 적용된 이미지를 파일에 저장한다.
+1. opencv를 사용하여 Image file load
+2. conv-filter apply
+3. filter appiled file 저장
 
-위 3가지 과정을 병렬로 빠르게 해보자.
 
 ---
 
@@ -53,10 +52,10 @@
 |120개, 총 58.2MB|1.586|2.386|3.972|25.305|
 
 ## 제안하는 알고리즘
-Image Filtering 시 Divide&Conquer기법을 이용, 이미지 분할 후 Multi Threading을 통해 이를 처리, 후에 결과를 합쳐 이미지를 재구성 하는 방식을 사용, 단 Image width&col<512pixel 일 경우 단일 쓰레드를 취하는 방식 사용
+Image Filtering 시 Divide&Conquer기법을 이용, 이미지 분할 후 Multi Threading을 통해 이를 처리, 후에 결과를 합쳐 이미지를 재구성 하는 방식을 사용, 단 Image width,col < 512pixel 일 경우 단일 쓰레드를 취하는 방식 사용  
+Image Save시에도 Divide&Conquer기법을 이용, 이미지 분할 후 Multu Threading을 통해 Bypass를 늘려 Throuput을 늘리는 방식 사용
 
-Image Filtering에서 Multi Threading 적용 시 175초->29초로 약6배 더 빨라졌다.
-
+Multi Threading 적용 시 약6~7배정도 excution time이 빨라졌다.
 
 ## Test Data Set 설명
 한 스레드가 처리하는 최대 이미지 크기를 256x256, 512x512, 1024x1024로 두고 데이터셋을 총 207MB의 25개 사진으로 하여 10번씩 테스트하였음
