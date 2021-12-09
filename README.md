@@ -1,4 +1,6 @@
 # Convolutional filter(s) for images
+## 프로젝트 소개
+CNN 알고리즘에서 이미지에 필터를 적용하는 과정을 병렬처리를 통해 빠르게 수행하도록 개선한 프로젝트이다.
 
 ## 개발 환경
 - OS : Window10
