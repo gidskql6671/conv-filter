@@ -17,6 +17,7 @@ int w_size, bias;     // kernel window size
 double** kernel; // image kernel 
 vector<filter*> filters;
 
+// const int thread_count = 1;
 const int thread_count = thread::hardware_concurrency();
 ThreadPool::ThreadPool pool(thread_count); // 스레드 풀 생성
 
@@ -143,12 +144,12 @@ int main(int argc, char *argv[]){
 	fs::path imageFolder(argv[1]);
 	fs::path outputFolder(argv[2]);
 	if (!fs::exists(imageFolder)){
-		cout << "이미지 폴더가 없습니다" << endl;
+		cout << argv[1] << " is Not Found" << endl;
 		pool.end();
 		return 0;
 	}
 	if (!fs::is_directory(imageFolder)){
-		cout << "폴더가 아닙니다" << endl;
+		cout << argv[1] << " is not Directory" << endl;
 		pool.end();
 		return 0;
 	}
